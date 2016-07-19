@@ -2,17 +2,13 @@ package bitmapFont;
 
 import haxe.Utf8;
 import haxe.xml.Fast;
-import openfl.display.Tilesheet;
 import openfl.display.BitmapData;
 import openfl.display.Graphics;
 import openfl.geom.ColorTransform;
 import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
-
-#if RENDER_TILE
-import openfl.display.Tilesheet;
-#end
+import openfl.display.Tileset;
 
 /**
  * Holds information and bitmap glyphs for a bitmap font.
@@ -172,7 +168,7 @@ class BitmapFont
 	public var glyphs:Map<Int, BitmapGlyphFrame>;
 	
 	#if RENDER_TILE
-	public var tilesheet:Tilesheet;
+	public var tileset:Tileset;
 	#end
 	
 	/**
@@ -183,7 +179,7 @@ class BitmapFont
 		this.bitmap = bitmap;
 		this.fontName = name;
 		#if RENDER_TILE
-		tilesheet = new Tilesheet(bitmap);
+		tileset = new Tileset(bitmap);
 		#end
 		glyphs = new Map<Int, BitmapGlyphFrame>();
 		BitmapFont.store(name, this);
@@ -202,7 +198,7 @@ class BitmapFont
 		
 		bitmap = null;
 		#if RENDER_TILE
-		tilesheet = null;
+		tileset = null;
 		#end
 		glyphs = null;
 		fontName = null;
@@ -536,7 +532,7 @@ class BitmapFont
 		glyphFrame.rect = frame;
 		
 		#if RENDER_TILE
-		glyphFrame.tileID = tilesheet.addTileRect(frame, new Point(0, 0));
+		glyphFrame.tileID = tileset.addRect(frame, new Point(0, 0));
 		#end
 		
 		glyphs.set(charCode, glyphFrame);

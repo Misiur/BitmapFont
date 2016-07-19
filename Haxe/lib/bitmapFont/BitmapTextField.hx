@@ -10,7 +10,7 @@ import flash.geom.Point;
 import bitmapFont.BitmapFont;
 import haxe.Utf8;
 import openfl.display.PixelSnapping;
-import openfl.display.Tilesheet;
+import openfl.display.Tileset;
 
 /**
  * Class for rendering text with provided bitmap font and some additional options.
@@ -1097,7 +1097,7 @@ class BitmapTextField extends Sprite
 			#if RENDER_BLIT
 			_bitmapData.unlock();
 			#else
-			font.tilesheet.drawTiles(this.graphics, _drawData, smoothing, Tilesheet.TILE_SCALE | Tilesheet.TILE_RGB | Tilesheet.TILE_ALPHA);
+			font.tileset.drawTiles(this.graphics, _drawData, smoothing, Tilesheet.TILE_SCALE | Tilesheet.TILE_RGB | Tilesheet.TILE_ALPHA);
 			#end
 		}
 		
