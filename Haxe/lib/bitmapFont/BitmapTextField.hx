@@ -11,6 +11,7 @@ import bitmapFont.BitmapFont;
 import haxe.Utf8;
 import openfl.display.PixelSnapping;
 import openfl.display.Tileset;
+import openfl.display.Tilemap;
 
 /**
  * Class for rendering text with provided bitmap font and some additional options.
@@ -199,7 +200,7 @@ class BitmapTextField extends Sprite
 	
 	private var _point:Point;
 	#else
-	private var _drawData:Array<Float>;
+	private var _tilemap:Tilemap;
 	#end
 	
 	/**
@@ -212,7 +213,16 @@ class BitmapTextField extends Sprite
 		super();
 		
 		shadowOffset = new Point(1, 1);
-		
+
+		if (font == null)
+		{
+			font = BitmapFont.getDefaultFont();
+		}
+
+		this.font = font;
+		this.text = text;
+		this.smoothing = smoothing;
+
 		#if RENDER_BLIT
 		pixelSnapping = (pixelSnapping == null) ? PixelSnapping.AUTO : pixelSnapping;
 		_bitmapData = new BitmapData(_fieldWidth, _fieldHeight, true, 0x00000000);
@@ -220,17 +230,10 @@ class BitmapTextField extends Sprite
 		addChild(_bitmap);
 		_point = new Point();
 		#else
-		_drawData = [];
+		_tilemap = new Tilemap(_fieldWidth, _fieldHeight, font.tileset);
+		addChild(_tilemap);
 		#end
 		
-		if (font == null)
-		{
-			font = BitmapFont.getDefaultFont();
-		}
-		
-		this.font = font;
-		this.text = text;
-		this.smoothing = smoothing;
 	}
 	
 	/**
@@ -272,8 +275,6 @@ class BitmapTextField extends Sprite
 			_bitmapData.dispose();
 		}
 		_bitmapData = null;
-		#else
-		_drawData = null;
 		#end
 	}
 	
@@ -915,7 +916,6 @@ class BitmapTextField extends Sprite
 		var colorForBorder:UInt = (borderStyle != TextBorderStyle.NONE) ? borderColor : 0xFFFFFFFF;
 		var colorForText:UInt = (useTextColor) ? textColor : 0xFFFFFFFF;
 		
-		_drawData.splice(0, _drawData.length);
 		#end
 		
 		if (size > 0)
@@ -1097,7 +1097,7 @@ class BitmapTextField extends Sprite
 			#if RENDER_BLIT
 			_bitmapData.unlock();
 			#else
-			font.tileset.drawTiles(this.graphics, _drawData, smoothing, Tilesheet.TILE_SCALE | Tilesheet.TILE_RGB | Tilesheet.TILE_ALPHA);
+			//font.tileset.drawTiles(this.graphics, _drawData, smoothing, Tilesheet.TILE_SCALE | Tilesheet.TILE_RGB | Tilesheet.TILE_ALPHA);
 			#end
 		}
 		
@@ -1162,8 +1162,6 @@ class BitmapTextField extends Sprite
 		var b:Float = (color & 0xFF) / 255;
 		var a:Float = ((color >> 24) & 0xFF) / 255;
 		
-		var pos:Int = _drawData.length;
-		
 		var lineLength:Int = Utf8.length(line);
 		
 		for (i in 0...lineLength)
@@ -1183,7 +1181,7 @@ class BitmapTextField extends Sprite
 				glyph = font.glyphs.get(charCode);
 				if (glyph != null)
 				{
-					_drawData[pos++] = curX + glyph.xoffset * size;
+					/*_drawData[pos++] = curX + glyph.xoffset * size;
 					_drawData[pos++] = curY + glyph.yoffset * size;
 				
 					_drawData[pos++] = glyph.tileID;
@@ -1193,9 +1191,14 @@ class BitmapTextField extends Sprite
 					_drawData[pos++] = r;
 					_drawData[pos++] = g;
 					_drawData[pos++] = b;
-					_drawData[pos++] = a;
+					_drawData[pos++] = a;*/
+
+					glyph.tile.x = curX + glyph.xoffset * size;
+					glyph.tile.y = curY + glyph.yoffset * size;
 					
 					curX += glyph.xadvance * size;
+
+					_tilemap.addTile(glyph.tile);
 				}				
 			}
 			

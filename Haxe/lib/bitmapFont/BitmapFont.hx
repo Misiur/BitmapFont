@@ -9,6 +9,7 @@ import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.display.Tileset;
+import openfl.display.Tile;
 
 /**
  * Holds information and bitmap glyphs for a bitmap font.
@@ -166,7 +167,7 @@ class BitmapFont
 	public var bitmap:BitmapData;
 	
 	public var glyphs:Map<Int, BitmapGlyphFrame>;
-	
+
 	#if RENDER_TILE
 	public var tileset:Tileset;
 	#end
@@ -199,6 +200,7 @@ class BitmapFont
 		bitmap = null;
 		#if RENDER_TILE
 		tileset = null;
+
 		#end
 		glyphs = null;
 		fontName = null;
@@ -247,7 +249,7 @@ class BitmapFont
 			frame.width = Std.parseInt(char.att.width);
 			frameHeight = Std.parseInt(char.att.height);
 			frame.height = frameHeight;
-			
+
 			xOffset = char.has.xoffset ? Std.parseInt(char.att.xoffset) : 0;
 			yOffset = char.has.yoffset ? Std.parseInt(char.att.yoffset) : 0;
 			xAdvance = char.has.xadvance ? Std.parseInt(char.att.xadvance) : 0;
@@ -532,7 +534,8 @@ class BitmapFont
 		glyphFrame.rect = frame;
 		
 		#if RENDER_TILE
-		glyphFrame.tileID = tileset.addRect(frame, new Point(0, 0));
+		glyphFrame.tileID = tileset.addRect(frame);
+		glyphFrame.tile = new Tile(glyphFrame.tileID);
 		#end
 		
 		glyphs.set(charCode, glyphFrame);
@@ -598,6 +601,8 @@ class BitmapGlyphFrame
 	 * tile id in parent's tileSheet
 	 */
 	public var tileID:Int;
+
+	public var tile:Tile;
 	
 	public function new(parent:BitmapFont)
 	{ 
@@ -622,7 +627,7 @@ class BitmapGlyphFrame
 		{
 			return _bitmap;
 		}
-		
+
 		_bitmap = new BitmapData(Math.ceil(rect.width), Math.ceil(rect.height), true, 0x00000000);
 		_bitmap.copyPixels(parent.bitmap, rect, new Point());
 		return _bitmap;
