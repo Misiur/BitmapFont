@@ -1191,7 +1191,7 @@ class BitmapTextField extends Sprite
 				glyph = font.glyphs.get(charCode);
 				if (glyph != null)
 				{
-					glyph.tile = glyph.tile.clone();
+					var tile = glyph.tile.clone();
 					/*_drawData[pos++] = curX + glyph.xoffset * size;
 					_drawData[pos++] = curY + glyph.yoffset * size;
 				
@@ -1204,11 +1204,13 @@ class BitmapTextField extends Sprite
 					_drawData[pos++] = b;
 					_drawData[pos++] = a;*/
 
-					glyph.tile.x = curX + glyph.xoffset * size;
-					glyph.tile.y = curY + glyph.yoffset * size;
+					tile.scaleX = size;
+					tile.scaleY = size;
+					tile.x = curX + glyph.xoffset * size;
+					tile.y = curY + glyph.yoffset * size;
 					
 					curX += glyph.xadvance * size;
-					_tilemap.addTile(glyph.tile);
+					_tilemap.addTile(tile);
 				}				
 			}
 			
