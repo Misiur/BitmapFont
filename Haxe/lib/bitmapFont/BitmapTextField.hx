@@ -219,21 +219,17 @@ class BitmapTextField extends Sprite
 			font = BitmapFont.getDefaultFont();
 		}
 
-		this.font = font;
-		this.text = text;
-		this.smoothing = smoothing;
-
 		#if RENDER_BLIT
 		pixelSnapping = (pixelSnapping == null) ? PixelSnapping.AUTO : pixelSnapping;
 		_bitmapData = new BitmapData(_fieldWidth, _fieldHeight, true, 0x00000000);
 		_bitmap = new Bitmap(_bitmapData, pixelSnapping, smoothing);
 		addChild(_bitmap);
 		_point = new Point();
-		#else
-		_tilemap = new Tilemap(_fieldWidth, _fieldHeight, font.tileset);
-		addChild(_tilemap);
 		#end
-		
+
+		this.font = font;
+		this.text = text;
+		this.smoothing = smoothing;
 	}
 	
 	/**
@@ -904,6 +900,18 @@ class BitmapTextField extends Sprite
 			_bitmapData.fillRect(_bitmapData.rect, colorForFill);
 		}
 		#else
+		if (_tilemap == null || (_fieldWidth != _tilemap.width || _fieldHeight != _tilemap.height))
+		{
+			if (_tilemap != null)
+			{
+				removeChild(_tilemap);
+				_tilemap = null;
+			}
+			
+			_tilemap = new Tilemap(_fieldWidth, _fieldHeight, font.tileset);
+			addChild(_tilemap);
+		}
+
 		this.graphics.clear();
 		
 		if (colorForFill != 0x00000000)
@@ -922,6 +930,8 @@ class BitmapTextField extends Sprite
 		{
 			#if RENDER_BLIT
 			_bitmapData.lock();
+			#else
+			_tilemap.removeTiles();
 			#end
 			
 			var numLines:Int = _lines.length;
@@ -1181,6 +1191,7 @@ class BitmapTextField extends Sprite
 				glyph = font.glyphs.get(charCode);
 				if (glyph != null)
 				{
+					glyph.tile = glyph.tile.clone();
 					/*_drawData[pos++] = curX + glyph.xoffset * size;
 					_drawData[pos++] = curY + glyph.yoffset * size;
 				
@@ -1197,7 +1208,6 @@ class BitmapTextField extends Sprite
 					glyph.tile.y = curY + glyph.yoffset * size;
 					
 					curX += glyph.xadvance * size;
-
 					_tilemap.addTile(glyph.tile);
 				}				
 			}
